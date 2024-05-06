@@ -1,0 +1,144 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+left to right direction
+
+package account {
+    class Account {
+        * accountId : String
+        ..
+        * accountNumber : String
+        * accountName : String
+        * description : String
+        * accountType : AccountType
+        balance : Balance
+    }
+
+    class AccountType {
+        * code : String
+        ..
+        * description : String
+    }
+
+    class AccountRole {
+        * accountId : String
+        * customerId : String
+        * roleType : AccountRoleType
+        * fromDate : Date
+        ..
+        thruDate : Date
+    }
+
+    class AccountRoleType {
+        * code : String
+        ..
+        * description : String
+    }
+
+    class AccountStatus {
+        * accountId : String
+        * statusType : AccountStatusType
+        * datetime : Instant
+        ..
+    }
+
+    class AccountStatusType {
+        * code : String
+        ..
+        * description : String
+    }
+
+    class AccountProduct {
+        * accountId : String
+        * productId : String
+        * fromDate : Date
+        ..
+        thruDate : Date
+    }
+
+    class Balance {
+        * accountId : String
+        ..
+        * amount : BigDecimal
+    }
+}
+
+Account *-- AccountRole
+AccountRole ..> AccountRoleType
+Account *-- AccountStatus
+AccountStatus ..> AccountStatusType
+Account ..> AccountType
+Account *-- AccountProduct
+Account o-- Balance
+
+
+package customer {
+    class Customer {
+        * customerId : String
+        ..
+        * customerNumber : String
+        * name : CustomerName
+    }
+
+     class CustomerName <<value object>> {
+        * firstName : String
+        * lastName : String
+        middleName : String
+    }
+}
+
+Customer ..> CustomerName
+
+package product {
+    class Product {
+        * productId : String
+        ..
+        * productNumber : String
+        * name : String
+        * description : String
+        * productType : ProductType
+    }
+
+    class ProductType {
+        * code : String
+        ..
+        * description : String
+    }
+}
+
+Product ..> ProductType
+
+package transaction {
+    class AccountTransaction {
+        * accountTransactionId : String
+        ..
+        * accountId : String
+        * transactionDate : Date
+        entryDate : Instant
+        postDate : Instant
+        amount : BigDecimal
+    }
+
+    class AccountTransactionStatus {
+        * accountTransactionId : String
+        * statusType : AccountTransactionStatusType
+        * datetime : Instant
+        ..
+    }
+
+    class AccountTransactionStatusType {
+        * code : String
+        ..
+        * description : String
+    }
+}
+
+AccountTransaction *-- AccountTransactionStatus
+AccountTransactionStatus ..> AccountTransactionStatusType
+
+customer.Customer <-- account.AccountRole
+product.Product <-- account.AccountProduct
+transaction.AccountTransaction --> account.Account
+
+
+@enduml

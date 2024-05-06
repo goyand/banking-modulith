@@ -1,0 +1,16 @@
+[libraries]
+spring-boot-starter = { group = "org.springframework.boot", name = "spring-boot-starter" }
+kotlin-reflect = { group = "org.jetbrains.kotlin", name = "kotlin-reflect" }
+spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+commons-lang3 = { group = "org.apache.commons", name = "commons-lang3", version = "3.14.0" }
+flyway = { group = "org.flywaydb", name = "flyway-core", version = "10.12.0" }
+flyway-database-postgresql = { group = "org.flywaydb", name = "flyway-database-postgresql", version = "10.12.0" }
+postgresql = { group = "org.postgresql", name = "postgresql", version = "42.7.3" }
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version = "3.2.4" }
+dependency-management = { id = "io.spring.dependency-management", version = "1.1.4" }
+detekt = { id = "io.gitlab.arturbosch.detekt", version = "1.23.6" }
+spotless = { id = "com.diffplug.spotless", version = "6.25.0" }
+terraform = { id = "org.ysb33r.terraform", version = "1.0.3" }
+flyway = { id = "org.flywaydb.flyway", version = "10.12.0" }

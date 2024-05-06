@@ -1,10 +1,16 @@
+import org.apache.groovy.util.Maps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
+import org.springframework.boot.gradle.tasks.run.BootRun
+import org.ysb33r.gradle.terraform.tasks.TerraformApply
+import org.ysb33r.gradle.terraform.tasks.TerraformDestroy
 
 plugins {
-	id("org.springframework.boot") version "3.2.4"
-	id("io.spring.dependency-management") version "1.1.4"
-	id("io.gitlab.arturbosch.detekt") version "1.23.6"
-	id("com.diffplug.spotless") version "6.25.0"
+	alias(libs.plugins.spring.boot)
+	alias(libs.plugins.dependency.management)
+	alias(libs.plugins.detekt)
+	alias(libs.plugins.spotless)
+	alias(libs.plugins.terraform)
+	alias(libs.plugins.flyway)
 	kotlin("jvm") version "1.9.23"
 	kotlin("plugin.spring") version "1.9.23"
 }
@@ -21,9 +27,19 @@ repositories {
 }
 
 dependencies {
-	implementation("org.springframework.boot:spring-boot-starter")
-	implementation("org.jetbrains.kotlin:kotlin-reflect")
-	testImplementation("org.springframework.boot:spring-boot-starter-test")
+	implementation(libs.spring.boot.starter)
+	implementation(libs.kotlin.reflect)
+	implementation(libs.commons.lang3)
+	implementation(libs.flyway)
+	runtimeOnly(libs.flyway.database.postgresql)
+	testImplementation(libs.spring.boot.starter.test)
+}
+
+buildscript {
+	dependencies {
+		classpath(libs.postgresql)
+		classpath(libs.flyway.database.postgresql)
+	}
 }
 
 tasks.withType<KotlinCompile> {
@@ -46,5 +62,63 @@ detekt {
 spotless {
 	kotlin {
 		ktfmt("0.47").googleStyle()
+	}
+}
+
+//terraform {
+//	executable(Maps.of("version", "1.6.4"))
+//}
+
+terraformSourceSets {
+	create("dev") {
+		setSrcDir("$projectDir/terraform/dev")
+	}
+}
+
+flyway {
+	url = "jdbc:postgresql://localhost:5432/banking"
+	user = "postgres"
+	password = "password"
+//	locations = arrayOf("classpath:db/migration")
+	cleanDisabled = false
+}
+
+// all tasks named starts with flyway should depend on tfDevApply
+tasks.filter { it.name.startsWith("flyway") }
+	.forEach {
+		it.dependsOn(tasks.withType(TerraformApply::class).named("tfDevApply"))
+//		it.finalizedBy(tasks.withType(TerraformDestroy::class).named("tfDevDestroy"))
+	}
+
+// set autoApprove true to terraform apply
+tasks.withType(TerraformDestroy::class).named("tfDevDestroy").configure {
+	setAutoApprove(true)
+}
+
+setOf(BootRun::class, Test::class).forEach {
+	tasks.withType(it) {
+		dependsOn(tasks.withType(TerraformApply::class).named("tfDevApply"))
+		finalizedBy(tasks.withType(TerraformDestroy::class).named("tfDevDestroy"))
+		doFirst {
+			val dbPortExternal = terraformSourceSets.getByName("dev").rawOutputVariable("db_port_external")
+			val dbPassword = terraformSourceSets.getByName("dev").rawOutputVariable("db_password")
+			val dbUser = terraformSourceSets.getByName("dev").rawOutputVariable("db_user")
+			val jdbcUrl = "jdbc:postgresql://localhost:$dbPortExternal;" +
+				"databaseName=banking;" +
+				"sslmode=disable;" +
+				"charset=utf8;"
+
+			// datasource
+			systemProperty("spring.datasource.url", jdbcUrl)
+			systemProperty("spring.datasource.username", dbUser)
+			systemProperty("spring.datasource.password", dbPassword)
+			systemProperty("spring.datasource.driver-class-name", "org.postgresql.Driver")
+
+			// flyway
+			systemProperty("spring.flyway.enabled", "true")
+			systemProperty("spring.flyway.url", jdbcUrl)
+			systemProperty("spring.flyway.user", dbUser)
+			systemProperty("spring.flyway.password", dbPassword)
+		}
 	}
 }

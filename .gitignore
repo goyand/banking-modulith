@@ -38,3 +38,8 @@ out/
 
 ### Kotlin ###
 .kotlin
+
+### Terraform ###
+*.tfstate
+*.tfstate.*
+*.terraform.lock.hcl

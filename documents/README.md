@@ -4,5 +4,10 @@
 
 ![DomainModel](./.attachments/DomainModel.svg)
 
-## Entity Relation
+## Architecture
 
+### Command
+![Architecture](./.attachments/Architecture-Clean_DDD___Command.svg)
+
+### Query
+![Architecture](./.attachments/Architecture-Clean_DDD___Query.svg)

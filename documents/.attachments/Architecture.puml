@@ -1,0 +1,123 @@
+@startuml
+'https://plantuml.com/class-diagram
+
+title Clean DDD - Command
+
+package infrastructure {
+    class Message {}
+
+    class Controller {}
+
+    interface JpaRepository {}
+
+    class RepositoryImpl {}
+
+    class DbEntity {}
+
+    interface GrpcServiceStub {}
+
+    class GrpcServiceImpl {}
+
+    class ProtoBuffer {}
+}
+
+infrastructure.Controller -left-> infrastructure.Message
+infrastructure.RepositoryImpl -up-> infrastructure.JpaRepository
+infrastructure.RepositoryImpl -left-> infrastructure.DbEntity
+infrastructure.GrpcServiceImpl -up-> infrastructure.GrpcServiceStub
+infrastructure.GrpcServiceImpl -left-> infrastructure.ProtoBuffer
+
+package application {
+    interface Interactor <<InputPort>> {}
+
+    class Dto {}
+
+    class InteractorImpl {}
+
+    interface Repository <<OutputPort>> {}
+
+    interface GrpcService <<OutputPort>> {}
+}
+
+application.Interactor -left-> application.Dto
+infrastructure.Controller --> application.Dto
+application.Interactor <|-- application.InteractorImpl
+infrastructure.Controller -down-> application.Interactor
+
+application.InteractorImpl -up-> application.Repository
+application.InteractorImpl -up-> application.GrpcService
+
+'hidden
+infrastructure.RepositoryImpl -[hidden]-> application.Interactor
+infrastructure.RepositoryImpl -[hidden]left-> infrastructure.Controller
+infrastructure.RepositoryImpl -[hidden]right-> infrastructure.GrpcServiceImpl
+domain.DomainEvent -[hidden]right-> domain.DomainService
+
+package domain {
+    class AggregateRoot {}
+
+    class Entity {}
+
+    class DomainService {}
+
+    class DomainEvent {}
+}
+
+domain.DomainService -right-> domain.AggregateRoot
+domain.AggregateRoot --> domain.Entity
+
+application.InteractorImpl --> domain.DomainEvent
+application.InteractorImpl --> domain.DomainService
+application.InteractorImpl --> domain.AggregateRoot
+
+application.Repository <|-- infrastructure.RepositoryImpl
+application.GrpcService <|-- infrastructure.GrpcServiceImpl
+
+infrastructure.RepositoryImpl -down-> domain.AggregateRoot
+infrastructure.GrpcServiceImpl -down-> domain.AggregateRoot
+
+@enduml
+
+@startuml
+'https://plantuml.com/class-diagram
+
+title Clean DDD - Query
+
+package infrastructure {
+    class Message {}
+
+    class Controller {}
+
+    interface JpaRepository {}
+
+    class RepositoryImpl {}
+}
+
+infrastructure.Controller -left-> infrastructure.Message
+infrastructure.RepositoryImpl -up-> infrastructure.JpaRepository
+
+package application {
+    interface Queries <<InputPort>> {}
+
+    class Dto {}
+
+    class QueriesImpl {}
+
+    interface Repository <<OutputPort>> {}
+}
+
+application.Queries -right-> application.Dto
+infrastructure.Controller --> application.Dto
+application.Queries <|-- application.QueriesImpl
+infrastructure.Controller -down-> application.Queries
+
+application.QueriesImpl -up-> application.Repository
+
+'hidden
+infrastructure.RepositoryImpl -[hidden]left-> infrastructure.Controller
+
+application.Repository <|-- infrastructure.RepositoryImpl
+
+infrastructure.RepositoryImpl --> application.Dto
+
+@enduml

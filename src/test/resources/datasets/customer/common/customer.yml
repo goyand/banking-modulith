@@ -1,0 +1,21 @@
+customers:
+  - id: 1
+    customer_number: cus-001
+    first_name: John
+    last_name: Doe
+    middle_name: Charles
+  - id: 2
+    customer_number: cus-002
+    first_name: Jane
+    last_name: Doe
+    middle_name: null
+  - id: 3
+    customer_number: cus-003
+    first_name: John
+    last_name: Smith
+    middle_name: null
+  - id: 4
+    customer_number: cus-004
+    first_name: Jane
+    last_name: Smith
+    middle_name: null

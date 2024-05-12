@@ -1,4 +1,4 @@
-create table customers (
+create table if not exists customers (
     id varchar(255) primary key,
     customer_number varchar(255) not null,
     first_name varchar(255) not null,

@@ -28,11 +28,24 @@ repositories {
 
 dependencies {
 	implementation(libs.spring.boot.starter)
+	implementation(libs.spring.boot.starter.web)
+	implementation(libs.spring.boot.starter.data.jpa)
+	implementation(libs.spring.boot.starter.validation)
+	implementation(libs.springdoc.openapi.starter.webmvc.ui)
+	implementation(libs.springdoc.openapi.starter.webmvc.api)
 	implementation(libs.kotlin.reflect)
 	implementation(libs.commons.lang3)
 	implementation(libs.flyway)
+	runtimeOnly(libs.postgresql)
 	runtimeOnly(libs.flyway.database.postgresql)
-	testImplementation(libs.spring.boot.starter.test)
+	testImplementation(libs.spring.boot.starter.test) {
+		exclude(group = "org.junit.vintage", module = "junit-vintage-engine")
+		exclude(group = "org.mockito", module = "mockito-core")
+	}
+	testImplementation(libs.junit.jupiter.engine)
+	testImplementation(libs.springmockk)
+	testImplementation(libs.rider.core)
+	testImplementation(libs.rider.spring)
 }
 
 buildscript {
@@ -62,6 +75,8 @@ detekt {
 spotless {
 	kotlin {
 		ktfmt("0.47").googleStyle()
+		indentWithTabs(2)
+		indentWithSpaces(4)
 	}
 }
 
@@ -83,7 +98,7 @@ flyway {
 	cleanDisabled = false
 }
 
-// all tasks named starts with flyway should depend on tfDevApply
+// all tasks named starts with "flyway" should depend on tfDevApply
 tasks.filter { it.name.startsWith("flyway") }
 	.forEach {
 		it.dependsOn(tasks.withType(TerraformApply::class).named("tfDevApply"))
@@ -100,13 +115,10 @@ setOf(BootRun::class, Test::class).forEach {
 		dependsOn(tasks.withType(TerraformApply::class).named("tfDevApply"))
 		finalizedBy(tasks.withType(TerraformDestroy::class).named("tfDevDestroy"))
 		doFirst {
-			val dbPortExternal = terraformSourceSets.getByName("dev").rawOutputVariable("db_port_external")
-			val dbPassword = terraformSourceSets.getByName("dev").rawOutputVariable("db_password")
-			val dbUser = terraformSourceSets.getByName("dev").rawOutputVariable("db_user")
-			val jdbcUrl = "jdbc:postgresql://localhost:$dbPortExternal;" +
-				"databaseName=banking;" +
-				"sslmode=disable;" +
-				"charset=utf8;"
+			val dbPortExternal = terraformSourceSets.getByName("dev").rawOutputVariable("db_port_external").get()
+			val dbPassword = terraformSourceSets.getByName("dev").rawOutputVariable("db_password").get()
+			val dbUser = terraformSourceSets.getByName("dev").rawOutputVariable("db_user").get()
+			val jdbcUrl = "jdbc:postgresql://localhost:$dbPortExternal/banking?schema=public"
 
 			// datasource
 			systemProperty("spring.datasource.url", jdbcUrl)

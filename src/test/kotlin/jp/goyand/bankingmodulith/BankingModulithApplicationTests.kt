@@ -6,8 +6,8 @@ import org.springframework.boot.test.context.SpringBootTest
 @SpringBootTest
 class BankingModulithApplicationTests {
 
-  @Test
-  fun contextLoads() {
-    // todo: add test
-  }
+    @Test
+    fun contextLoads() {
+        // todo: add test
+    }
 }

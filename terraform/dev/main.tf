@@ -53,3 +53,11 @@ resource "docker_container" "db" {
 output "db_port_external" {
   value = docker_container.db.ports[0].external
 }
+
+output "db_user" {
+  value = var.db_user
+}
+
+output "db_password" {
+  value = var.db_password
+}

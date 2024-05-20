@@ -1,6 +1,6 @@
 package jp.goyand.bankingmodulith.customer.application.dto
 
-data class CustomerDto(
+data class CustomerQueryDto(
     val id: String,
     val customerNumber: String,
     val firstName: String,

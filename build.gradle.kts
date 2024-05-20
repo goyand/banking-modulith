@@ -1,4 +1,3 @@
-import org.apache.groovy.util.Maps
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.run.BootRun
 import org.ysb33r.gradle.terraform.tasks.TerraformApply
@@ -11,8 +10,9 @@ plugins {
 	alias(libs.plugins.spotless)
 	alias(libs.plugins.terraform)
 	alias(libs.plugins.flyway)
-	kotlin("jvm") version "1.9.23"
-	kotlin("plugin.spring") version "1.9.23"
+	kotlin("jvm") version "1.9.24"
+	kotlin("plugin.spring") version "1.9.24"
+	kotlin("plugin.jpa") version "1.9.24"
 }
 
 group = "jp.goyand"
@@ -35,7 +35,9 @@ dependencies {
 	implementation(libs.springdoc.openapi.starter.webmvc.api)
 	implementation(libs.kotlin.reflect)
 	implementation(libs.commons.lang3)
+	implementation(libs.jnanoid)
 	implementation(libs.flyway)
+//	implementation("org.jetbrains.kotlin:kotlin-maven-noarg:1.9.24")
 	runtimeOnly(libs.postgresql)
 	runtimeOnly(libs.flyway.database.postgresql)
 	testImplementation(libs.spring.boot.starter.test) {

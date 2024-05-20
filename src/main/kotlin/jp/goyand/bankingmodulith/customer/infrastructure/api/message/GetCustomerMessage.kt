@@ -1,6 +1,6 @@
 package jp.goyand.bankingmodulith.customer.infrastructure.api.message
 
-import jp.goyand.bankingmodulith.customer.application.dto.CustomerDto
+import jp.goyand.bankingmodulith.customer.application.dto.CustomerQueryDto
 
 interface GetCustomerResponse {
     val id: String
@@ -10,7 +10,7 @@ interface GetCustomerResponse {
     val middleName: String?
 
     companion object {
-        fun from(customerDto: CustomerDto): GetCustomerResponse {
+        fun from(customerDto: CustomerQueryDto): GetCustomerResponse {
             return object : GetCustomerResponse {
                 override val id = customerDto.id
                 override val customerNumber = customerDto.customerNumber

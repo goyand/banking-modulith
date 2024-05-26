@@ -4,7 +4,7 @@ import jakarta.persistence.*
 import org.hibernate.annotations.GenericGenerator
 
 @MappedSuperclass
-open class IdBaseEntity(
+abstract class IdBaseEntity(
     @Id
     @GenericGenerator(name = "id", strategy = "jp.goyand.bankingmodulith.common.db.IdGenerator")
     @GeneratedValue(generator = "id")

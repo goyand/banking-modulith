@@ -24,6 +24,16 @@ java {
 
 repositories {
 	mavenCentral()
+	maven("https://repo.spring.io/milestone")
+}
+
+dependencyManagement {
+	imports {
+		mavenBom("org.springframework.modulith:spring-modulith-bom:1.1.5")
+
+		// Uncomment the line below to use the latest version of the Spring Modulith BOM
+		// mavenBom("org.springframework.modulith:spring-modulith-bom:1.2.0")
+	}
 }
 
 dependencies {
@@ -31,13 +41,15 @@ dependencies {
 	implementation(libs.spring.boot.starter.web)
 	implementation(libs.spring.boot.starter.data.jpa)
 	implementation(libs.spring.boot.starter.validation)
+	implementation(libs.spring.modulith.starter.jpa)
+	runtimeOnly(libs.spring.modulith.starter.insight)
+
 	implementation(libs.springdoc.openapi.starter.webmvc.ui)
 	implementation(libs.springdoc.openapi.starter.webmvc.api)
 	implementation(libs.kotlin.reflect)
 	implementation(libs.commons.lang3)
 	implementation(libs.jnanoid)
 	implementation(libs.flyway)
-//	implementation("org.jetbrains.kotlin:kotlin-maven-noarg:1.9.24")
 	runtimeOnly(libs.postgresql)
 	runtimeOnly(libs.flyway.database.postgresql)
 	testImplementation(libs.spring.boot.starter.test) {
@@ -48,6 +60,8 @@ dependencies {
 	testImplementation(libs.springmockk)
 	testImplementation(libs.rider.core)
 	testImplementation(libs.rider.spring)
+	testImplementation(libs.spring.modulith.starter.test)
+	testImplementation(libs.assertj.core)
 }
 
 buildscript {
@@ -81,10 +95,6 @@ spotless {
 		indentWithSpaces(4)
 	}
 }
-
-//terraform {
-//	executable(Maps.of("version", "1.6.4"))
-//}
 
 terraformSourceSets {
 	create("dev") {

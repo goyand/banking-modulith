@@ -1,10 +1,13 @@
 package jp.goyand.bankingmodulith.customer.infrastructure
 
+import org.assertj.core.api.Assertions.*
+
 import com.github.database.rider.core.api.dataset.DataSet
 import com.github.database.rider.spring.api.DBRider
 import io.mockk.every
 import io.mockk.mockkObject
 import jp.goyand.bankingmodulith.common.entity.NumberGenerator
+import jp.goyand.bankingmodulith.customer.domain.event.CustomerCreated
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Nested
 import org.junit.jupiter.api.Test
@@ -12,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.http.MediaType
+import org.springframework.modulith.test.AssertablePublishedEvents
 import org.springframework.test.context.ActiveProfiles
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get
@@ -49,7 +53,7 @@ class CustomerControllerTest(@Autowired val mockMvc: MockMvc) {
     }
 
     @Nested
-    inner class CreateCustomer {
+    inner class CreateCustomerUseCase {
 
         private val customerNumber = "C-0000001"
 
@@ -60,7 +64,9 @@ class CustomerControllerTest(@Autowired val mockMvc: MockMvc) {
         }
 
         @Test
-        fun `should create customer`() {
+        fun `should create customer`(
+//            events: AssertablePublishedEvents
+        ) {
             // execute & verify
             mockMvc
                 .perform(
@@ -82,6 +88,9 @@ class CustomerControllerTest(@Autowired val mockMvc: MockMvc) {
                 .andExpect(jsonPath("$.firstName").value("Jane"))
                 .andExpect(jsonPath("$.lastName").value("Doe"))
                 .andExpect(jsonPath("$.middleName").value("Alice"))
+
+//            assertThat(events)
+//                .contains(CustomerCreated::class.java)
         }
 
         @Test

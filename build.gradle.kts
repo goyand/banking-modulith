@@ -1,14 +1,11 @@
 import org.jetbrains.kotlin.gradle.tasks.KotlinCompile
 import org.springframework.boot.gradle.tasks.run.BootRun
-import org.ysb33r.gradle.terraform.tasks.TerraformApply
-import org.ysb33r.gradle.terraform.tasks.TerraformDestroy
 
 plugins {
 	alias(libs.plugins.spring.boot)
 	alias(libs.plugins.dependency.management)
 	alias(libs.plugins.detekt)
 	alias(libs.plugins.spotless)
-	alias(libs.plugins.terraform)
 	alias(libs.plugins.flyway)
 	kotlin("jvm") version "1.9.24"
 	kotlin("plugin.spring") version "1.9.24"
@@ -96,53 +93,10 @@ spotless {
 	}
 }
 
-terraformSourceSets {
-	create("dev") {
-		setSrcDir("$projectDir/terraform/dev")
-	}
-}
-
 flyway {
 	url = "jdbc:postgresql://localhost:5432/banking"
 	user = "postgres"
 	password = "password"
 //	locations = arrayOf("classpath:db/migration")
 	cleanDisabled = false
-}
-
-// all tasks named starts with "flyway" should depend on tfDevApply
-tasks.filter { it.name.startsWith("flyway") }
-	.forEach {
-		it.dependsOn(tasks.withType(TerraformApply::class).named("tfDevApply"))
-//		it.finalizedBy(tasks.withType(TerraformDestroy::class).named("tfDevDestroy"))
-	}
-
-// set autoApprove true to terraform apply
-tasks.withType(TerraformDestroy::class).named("tfDevDestroy").configure {
-	setAutoApprove(true)
-}
-
-setOf(BootRun::class, Test::class).forEach {
-	tasks.withType(it) {
-		dependsOn(tasks.withType(TerraformApply::class).named("tfDevApply"))
-		finalizedBy(tasks.withType(TerraformDestroy::class).named("tfDevDestroy"))
-		doFirst {
-			val dbPortExternal = terraformSourceSets.getByName("dev").rawOutputVariable("db_port_external").get()
-			val dbPassword = terraformSourceSets.getByName("dev").rawOutputVariable("db_password").get()
-			val dbUser = terraformSourceSets.getByName("dev").rawOutputVariable("db_user").get()
-			val jdbcUrl = "jdbc:postgresql://localhost:$dbPortExternal/banking?schema=public"
-
-			// datasource
-			systemProperty("spring.datasource.url", jdbcUrl)
-			systemProperty("spring.datasource.username", dbUser)
-			systemProperty("spring.datasource.password", dbPassword)
-			systemProperty("spring.datasource.driver-class-name", "org.postgresql.Driver")
-
-			// flyway
-			systemProperty("spring.flyway.enabled", "true")
-			systemProperty("spring.flyway.url", jdbcUrl)
-			systemProperty("spring.flyway.user", dbUser)
-			systemProperty("spring.flyway.password", dbPassword)
-		}
-	}
 }

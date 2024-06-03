@@ -9,10 +9,6 @@ class BankingModulithApplicationTests {
 
     @Test
     fun contextLoads() {
-        // todo: add test
-        ApplicationModules.of(BankingModulithApplication::class.java).forEach(::println)
-        ApplicationModules.of(BankingModulithApplication::class.java).sharedModules.forEach(::println)
-
         ApplicationModules.of(BankingModulithApplication::class.java).verify()
     }
 }
